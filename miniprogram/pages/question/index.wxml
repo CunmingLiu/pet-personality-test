@@ -1,27 +1,46 @@
 <view class="page">
-  <view class="progress">{{currentIndex + 1}} / {{total}}</view>
-
+  <view class="progress-wrap">
+    <view class="progress-head">
+      <view class="stage-title">{{stageTitle}}</view>
+      <view class="progress-text">{{progressText}}</view>
+    </view>
+    <view class="progress-track">
+      <view class="progress-bar" style="width: {{progressPercent}}%;"></view>
+    </view>
+    <view class="milestone-text">{{milestoneText}}</view>
+  </view>
+  <view class="card" wx:if="{{loading}}">
+    <view class="skeleton-line w70"></view>
+    <view class="skeleton-options">
+      <view class="skeleton-option"></view>
+      <view class="skeleton-option"></view>
+      <view class="skeleton-option"></view>
+      <view class="skeleton-option"></view>
+      <view class="skeleton-option short"></view>
+    </view>
+  </view>
   <view class="card" wx:if="{{!loading && total > 0}}">
     <view class="question-title">{{currentQuestion.title}}</view>
     <view class="options">
-      <view
-        wx:for="{{currentQuestion.options}}"
-        wx:key="index"
-        class="option {{selectedOptionIndex === index ? 'active' : ''}}"
-        bindtap="onSelectOption"
-        data-index="{{index}}"
-      >
+      <view wx:for="{{currentQuestion.options}}" wx:key="index" class="option {{selectedOptionIndex === index ? 'active' : ''}}" bindtap="onSelectOption" data-index="{{index}}">
         {{item.text}}
       </view>
     </view>
   </view>
-
   <view class="empty" wx:if="{{!loading && total === 0}}">题目加载失败，请返回首页重试</view>
-  <view class="empty" wx:if="{{loading}}">题目加载中...</view>
-
-  <button class="next-btn" bindtap="onNext" wx:if="{{!loading && total > 0}}">
-    {{isLastQuestion ? '提交测试' : '下一题'}}
-  </button>
-
-  <!-- <view class="compliance-tip">本测试仅供娱乐，非专业心理测评</view> -->
+  <view class="bottom-actions" wx:if="{{!loading && total > 0 && !submitting}}">
+    <button class="nav-btn ghost" bindtap="onPrev" disabled="{{currentIndex === 0}}">上一题</button>
+    <button class="nav-btn primary" bindtap="onNext">{{isLastQuestion ? '提交测试' : '下一题'}}</button>
+  </view>
+  <view class="submit-overlay" wx:if="{{submitting}}">
+    <view class="submit-card">
+      <view class="paw-loader">
+        <view class="paw-dot dot1"></view>
+        <view class="paw-dot dot2"></view>
+        <view class="paw-dot dot3"></view>
+      </view>
+      <view class="submit-title">正在生成你的专属结果</view>
+      <!-- <view class="submit-tip">{{submitTips[submitTipIndex]}}</view> -->
+    </view>
+  </view>
 </view>

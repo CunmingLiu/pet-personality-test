@@ -39,6 +39,7 @@ Page({
 
   async loadResult(resultKey) {
     this.setData({ loading: true });
+
     try {
       const resp = await wx.cloud.callFunction({
         name: "quickstartFunctions",
@@ -197,7 +198,7 @@ Page({
 
     ctx.setFillStyle("#98a2b3");
     ctx.setFontSize(22);
-    ctx.fillText("测试结果仅供参考·数据本地存储", pad, height - 36);
+    ctx.fillText("愿你像自己的专属小动物一样发光", pad, height - 36);
 
     ctx.draw(false, () => {
       // drawImage 解码略晚于 draw 回调时，立刻导出会丢图；延迟一帧再导出更稳

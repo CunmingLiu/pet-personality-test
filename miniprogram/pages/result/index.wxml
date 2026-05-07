@@ -7,11 +7,24 @@
     </view>
     <view class="result-desc">{{result.desc}}</view>
   </view>
-  <view class="result-card" wx:if="{{loading}}">结果加载中...</view>
-  <button class="action-btn" bindtap="onSavePoster">保存海报</button>
-  <button class="action-btn share-btn" open-type="share">分享好友</button>
-  <button class="action-btn ghost-btn" bindtap="onRetest">重新测试</button>
+
+  <view class="result-card skeleton-card" wx:if="{{loading}}">
+    <view class="skeleton-img"></view>
+    <view class="skeleton-line w80"></view>
+    <view class="skeleton-tags">
+      <view class="skeleton-chip"></view>
+      <view class="skeleton-chip"></view>
+      <view class="skeleton-chip short"></view>
+    </view>
+    <view class="skeleton-line"></view>
+    <view class="skeleton-line"></view>
+    <view class="skeleton-line w60"></view>
+  </view>
+
+  <button class="action-btn" bindtap="onSavePoster" wx:if="{{!loading}}">保存海报</button>
+  <!-- <button class="action-btn share-btn" open-type="share">分享好友</button> -->
+  <button class="action-btn ghost-btn" bindtap="onRetest" wx:if="{{!loading}}">重新测试</button>
   <canvas canvas-id="posterCanvas" class="poster-canvas" width="600" height="960"></canvas>
   <!-- <view class="compliance-tip">本测试仅供娱乐，非专业心理测评</view> -->
-  <view class="compliance-tip">愿你像自己的专属小动物一样发光</view>
+  <view class="compliance-tip" wx:if="{{!loading}}">愿你像自己的专属小动物一样发光</view>
 </view>
