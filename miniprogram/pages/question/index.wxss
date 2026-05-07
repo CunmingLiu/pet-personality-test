@@ -1,0 +1,84 @@
+page {
+  background: #f7f8fc;
+}
+
+.page {
+  min-height: 100vh;
+  padding: 30rpx;
+  box-sizing: border-box;
+}
+
+.progress {
+  text-align: right;
+  color: #667085;
+  font-size: 24rpx;
+}
+
+.card {
+  margin-top: 18rpx;
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 28rpx;
+}
+
+.question-title {
+  font-size: 34rpx;
+  color: #222;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.options {
+  margin-top: 24rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+}
+
+.option {
+  padding: 24rpx;
+  border-radius: 14rpx;
+  font-size: 28rpx;
+  border: 2rpx solid #e4e7ec;
+  color: #344054;
+  background: #fff;
+}
+
+.option.active {
+  border-color: #ff7a45;
+  background: #fff4ee;
+  color: #9c3e1a;
+}
+
+.next-btn {
+  margin-top: 30rpx;
+  border-radius: 44rpx;
+  height: 88rpx;
+  background: #ff7a45;
+  color: #fff;
+  font-size: 30rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: normal;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.next-btn::after {
+  border: none;
+}
+
+.empty {
+  margin-top: 30rpx;
+  text-align: center;
+  color: #98a2b3;
+  font-size: 26rpx;
+}
+
+.compliance-tip {
+  margin-top: 20rpx;
+  text-align: center;
+  font-size: 24rpx;
+  color: #98a2b3;
+}

@@ -1,0 +1,18 @@
+<view class="page">
+  <view class="hero">
+    <view class="hero-badge">MBTI 四维模型（E/I・S/N・T/F・J/P）</view>
+    <view class="hero-title">来看看你属于哪种萌宠性格</view>
+    <view class="hero-subtitle">融合 MBTI 偏好维度与动物人格映射，20 道题更稳地识别你的专属类型</view>
+  </view>
+  <view class="animal-grid">
+    <view wx:for="{{animals}}" wx:key="name" class="animal-item">
+      <view class="animal-name">{{item}}</view>
+    </view>
+  </view>
+  <button class="start-btn" bindtap="onStartTest">开始测试</button>
+  <view class="ad-slot">广告位预留（Banner）</view>
+  <view class="footer-tip">20道题 × MBTI 四维偏好，解锁你的专属动物人格</view>
+  <!-- <view class="compliance-tip">本测试仅供娱乐，非专业心理测评</view> -->
+  <view class="compliance-tip">愿你像自己的专属小动物一样发光</view>
+
+</view>
