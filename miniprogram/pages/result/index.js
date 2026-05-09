@@ -107,8 +107,8 @@ Page({
   drawPosterToCanvas(result, imagePath, imgW, imgH) {
     const ctx = wx.createCanvasContext("posterCanvas", this);
     const width = 600;
-    const height = 960;
-    const pad = 40;
+    const height = 900;
+    const pad = 42;
     const innerW = width - pad * 2;
 
     const roundRectPath = (x, y, w, h, r) => {
@@ -126,82 +126,114 @@ Page({
       ctx.closePath();
     };
 
-    ctx.setFillStyle("#fff7f2");
+    // 背景
+    ctx.setFillStyle("#f6efe9");
     ctx.fillRect(0, 0, width, height);
 
-    ctx.setFillStyle("#fdeee8");
-    ctx.fillRect(0, 0, width, 118);
+    // 主卡片
+    const card = { x: 20, y: 20, w: width - 40, h: height - 40 };
+    ctx.setFillStyle("#fff7f2");
+    roundRectPath(card.x, card.y, card.w, card.h, 26);
+    ctx.fill();
+    ctx.setStrokeStyle("rgba(255, 163, 122, 0.28)");
+    ctx.setLineWidth(2);
+    roundRectPath(card.x, card.y, card.w, card.h, 26);
+    ctx.stroke();
 
+    // 顶部暖色区（无边框、无圆角）
+    ctx.setFillStyle("#fff7f2");
+    ctx.fillRect(card.x + 14, card.y + 14, card.w - 28, 118);
+
+    // 标题
     ctx.setFillStyle("#1d2939");
-    ctx.setFontSize(32);
-    ctx.fillText("宠物动物系性格测试", pad, 62);
+    ctx.setFontSize(30);
+    ctx.fillText("萌宠系性格测试", pad + 6, 78);
 
     ctx.setFillStyle("#98a2b3");
-    ctx.setFontSize(22);
-    ctx.fillText("你的专属动物人格", pad, 98);
+    ctx.setFontSize(20);
+    ctx.fillText("你的专属动物人格", pad + 6, 110);
 
-    const imgBox = { x: pad, y: 146, w: innerW, h: 280 };
-    let bodyTop = imgBox.y + imgBox.h + 57;
+    // 图片区（圆形居中）
+    const circleSize = 286;
+    const circleR = circleSize / 2;
+    const circleCx = width / 2;
+    const circleCy = 298;
+    const imgBox = {
+      x: circleCx - circleR,
+      y: circleCy - circleR,
+      w: circleSize,
+      h: circleSize,
+    };
+    let bodyTop = imgBox.y + imgBox.h + 56;
 
     if (imagePath && imgW > 0 && imgH > 0) {
-      /* 暖灰衬底，与整页 #fff7f2 / #fdeee8 一致，避免冷色 #f2f4f7 夹在中间发蓝 */
-      ctx.setFillStyle("#fff7f2");
-      roundRectPath(imgBox.x, imgBox.y, imgBox.w, imgBox.h, 20);
-      ctx.fill();
-
       ctx.save();
-      roundRectPath(imgBox.x, imgBox.y, imgBox.w, imgBox.h, 20);
+      ctx.beginPath();
+      ctx.arc(circleCx, circleCy, circleR, 0, Math.PI * 2);
+      ctx.closePath();
       ctx.clip();
 
-      const scale = Math.min(imgBox.w / imgW, imgBox.h / imgH);
+      const scale = Math.max(imgBox.w / imgW, imgBox.h / imgH);
       const dw = imgW * scale;
       const dh = imgH * scale;
       const dx = imgBox.x + (imgBox.w - dw) / 2;
       const dy = imgBox.y + (imgBox.h - dh) / 2;
       ctx.drawImage(imagePath, dx, dy, dw, dh);
       ctx.restore();
-
-      // ctx.setStrokeStyle("rgba(181, 71, 8, 0.15)");
-      // ctx.setLineWidth(2);
-      // roundRectPath(imgBox.x, imgBox.y, imgBox.w, imgBox.h, 20);
-      // ctx.stroke();
     } else {
-      bodyTop = 154;
+      bodyTop = 188;
     }
 
+    // 结果标题
     ctx.setFillStyle("#ff7a45");
-    ctx.setFontSize(38);
-    ctx.fillText(result.title || "测试结果", pad, bodyTop);
+    ctx.setFontSize(32);
+    const title = result.title || "测试结果";
+    const titleLines = this.wrapTextByWidth(ctx, title, innerW);
+    const titleLineH = 42;
+    titleLines.slice(0, 2).forEach((line, idx) => {
+      ctx.fillText(line, pad, bodyTop + idx * titleLineH);
+    });
 
-    ctx.setFillStyle("#344054");
-    ctx.setFontSize(26);
+    // 标签
+    ctx.setFillStyle("#b54708");
+    ctx.setFontSize(22);
     const tags = result.tags || [];
-    const tagY = bodyTop + 44;
-    const tagColW = 172;
+    const tagColW = 70;
+    const titleRows = Math.max(1, titleLines.slice(0, 2).length);
+    const tagStartY = bodyTop + titleRows * titleLineH + 3;
+    const tagLineH = 36;
+    const tagStartX = pad + 6;
     tags.forEach((tag, idx) => {
       const col = idx % 3;
       const row = Math.floor(idx / 3);
-      ctx.fillText(`#${tag}`, pad + col * tagColW, tagY + row * 36);
+      ctx.fillText(`#${tag}`, tagStartX + col * tagColW, tagStartY + row * tagLineH);
     });
 
+    // 描述
     ctx.setFillStyle("#475467");
-    ctx.setFontSize(26);
+    ctx.setFontSize(22);
     const text = result.desc || "";
     const lines = this.wrapTextByWidth(ctx, text, innerW);
     const tagRows = tags.length === 0 ? 0 : Math.ceil(tags.length / 3);
-    const descTop = tagY + (tagRows ? tagRows * 36 + 20 : 8);
-    const lineStep = 42;
-    const maxDescLines = imagePath && imgW > 0 ? 6 : 8;
+    const descTop = tagStartY + (tagRows ? tagRows * tagLineH + 10 : 10);
+    const lineStep = 38;
+
+    // 为底部文案预留空间，动态计算可展示行数，避免出现大面积空白
+    const footerY = height - 48;
+    const contentBottomSafe = footerY - 26;
+    const availableH = Math.max(0, contentBottomSafe - descTop);
+    const maxDescLines = Math.max(2, Math.floor(availableH / lineStep));
+
     lines.slice(0, maxDescLines).forEach((line, idx) => {
       ctx.fillText(line, pad, descTop + idx * lineStep);
     });
 
+    // 底部提示
     ctx.setFillStyle("#98a2b3");
-    ctx.setFontSize(22);
-    ctx.fillText("愿你像自己的专属小动物一样发光", pad, height - 36);
+    ctx.setFontSize(18);
+    ctx.fillText("愿你像自己的专属小动物一样发光", pad, footerY);
 
     ctx.draw(false, () => {
-      // drawImage 解码略晚于 draw 回调时，立刻导出会丢图；延迟一帧再导出更稳
       setTimeout(() => {
         wx.canvasToTempFilePath(
           {

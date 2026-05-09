@@ -1,4 +1,5 @@
 const STORAGE_KEY = "pet_test_progress_v1";
+const QUESTIONS_CACHE_KEY = "pet_questions_cache_v1";
 
 const STAGES = [
   "社交能量站",
@@ -32,41 +33,76 @@ Page({
 
   async loadQuestions() {
     this.setData({ loading: true });
+
+    const cached = this.getCachedQuestions();
+    if (cached.length) {
+      this.applyQuestions(cached);
+      return;
+    }
+
     try {
       const resp = await wx.cloud.callFunction({
         name: "quickstartFunctions",
         data: { type: "getQuestions" }
       });
       const questions = (resp.result && resp.result.data) || [];
-      const saved = this.getSavedProgress();
-
-      let answers = [];
-      let currentIndex = 0;
-      let selectedOptionIndex = -1;
-
-      if (saved && Array.isArray(saved.answers) && saved.answers.length) {
-        answers = saved.answers.filter((item) => item && item.qid);
-        currentIndex = Math.min(saved.currentIndex || answers.length || 0, Math.max(questions.length - 1, 0));
-        selectedOptionIndex = typeof saved.selectedOptionIndex === "number" ? saved.selectedOptionIndex : -1;
+      if (questions.length) {
+        this.cacheQuestions(questions);
       }
-
-      this.setData(
-        {
-          questions,
-          total: questions.length,
-          currentIndex,
-          currentQuestion: questions[currentIndex] || {},
-          selectedOptionIndex,
-          answers,
-          isLastQuestion: questions.length > 0 && currentIndex === questions.length - 1,
-          loading: false
-        },
-        () => this.updateViewState()
-      );
+      this.applyQuestions(questions);
     } catch (err) {
       this.setData({ loading: false, questions: [], total: 0, currentQuestion: {} });
       wx.showToast({ title: "题目加载失败", icon: "none" });
       console.warn("loadQuestions failed", err);
+    }
+  },
+
+  applyQuestions(questions) {
+    const saved = this.getSavedProgress();
+
+    let answers = [];
+    let currentIndex = 0;
+    let selectedOptionIndex = -1;
+
+    if (saved && Array.isArray(saved.answers) && saved.answers.length) {
+      answers = saved.answers.filter((item) => item && item.qid);
+      currentIndex = Math.min(saved.currentIndex || answers.length || 0, Math.max(questions.length - 1, 0));
+      selectedOptionIndex = typeof saved.selectedOptionIndex === "number" ? saved.selectedOptionIndex : -1;
+    }
+
+    this.setData(
+      {
+        questions,
+        total: questions.length,
+        currentIndex,
+        currentQuestion: questions[currentIndex] || {},
+        selectedOptionIndex,
+        answers,
+        isLastQuestion: questions.length > 0 && currentIndex === questions.length - 1,
+        loading: false
+      },
+      () => this.updateViewState()
+    );
+  },
+
+  cacheQuestions(questions) {
+    try {
+      wx.setStorageSync(QUESTIONS_CACHE_KEY, {
+        questions,
+        updatedAt: Date.now()
+      });
+    } catch (e) {
+      console.warn("cacheQuestions failed", e);
+    }
+  },
+
+  getCachedQuestions() {
+    try {
+      const cached = wx.getStorageSync(QUESTIONS_CACHE_KEY);
+      if (!cached || !Array.isArray(cached.questions)) return [];
+      return cached.questions;
+    } catch (e) {
+      return [];
     }
   },
 

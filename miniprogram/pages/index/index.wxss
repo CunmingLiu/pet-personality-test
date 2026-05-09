@@ -41,6 +41,47 @@ page {
   line-height: 1.6;
 }
 
+.hero-icons {
+  margin-top: 18rpx;
+  display: flex;
+  gap: 12rpx;
+}
+
+/*线型动物图标*/
+.hero-icon {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.7);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30rpx;
+}
+
+.hero-icon-wrap {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 50%;
+  padding: 2rpx;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 6rpx 14rpx rgba(17, 24, 39, 0.08);
+  overflow: hidden;
+}
+
+.hero-icon-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: block;
+}
+
+.hero-extra {
+  margin-top: 14rpx;
+  font-size: 23rpx;
+  color: #8f6a5b;
+}
+
 .animal-grid {
   margin-top: 30rpx;
   display: grid;

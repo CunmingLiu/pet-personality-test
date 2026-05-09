@@ -16,11 +16,11 @@ page {
 }
 
 .result-image {
-  width: 100%;
+  width: 320rpx;
   height: 320rpx;
-  border-radius: 16rpx;
-  margin-bottom: 20rpx;
-  /* background: #f2f4f7; */
+  border-radius: 50%;
+  margin: 0 auto 24rpx;
+  display: block;
 }
 
 .result-title {

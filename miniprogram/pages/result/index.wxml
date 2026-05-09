@@ -1,6 +1,6 @@
 <view class="page">
   <view class="result-card" wx:if="{{!loading}}">
-    <image wx:if="{{result.imageUrl}}" class="result-image" src="{{result.imageUrl}}" mode="aspectFit"></image>
+    <image wx:if="{{result.imageUrl}}" class="result-image" src="{{result.imageUrl}}" mode="aspectFill"></image>
     <view class="result-title">{{result.title}}</view>
     <view class="result-tags">
       <text class="tag" wx:for="{{result.tags}}" wx:key="*this">{{item}}</text>
@@ -22,9 +22,9 @@
   </view>
 
   <button class="action-btn" bindtap="onSavePoster" wx:if="{{!loading}}">保存海报</button>
-  <!-- <button class="action-btn share-btn" open-type="share">分享好友</button> -->
+  <button class="action-btn share-btn" open-type="share">分享好友</button>
   <button class="action-btn ghost-btn" bindtap="onRetest" wx:if="{{!loading}}">重新测试</button>
-  <canvas canvas-id="posterCanvas" class="poster-canvas" width="600" height="960"></canvas>
+  <canvas canvas-id="posterCanvas" class="poster-canvas" width="600" height="900"></canvas>
   <!-- <view class="compliance-tip">本测试仅供娱乐，非专业心理测评</view> -->
   <view class="compliance-tip" wx:if="{{!loading}}">愿你像自己的专属小动物一样发光</view>
 </view>

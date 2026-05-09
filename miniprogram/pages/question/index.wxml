@@ -2,7 +2,7 @@
   <view class="progress-wrap">
     <view class="progress-head">
       <view class="stage-title">{{stageTitle}}</view>
-      <view class="progress-text">{{progressText}}</view>
+      <view class="progress-text" wx:if="{{!loading}}">{{progressText}}</view>
     </view>
     <view class="progress-track">
       <view class="progress-bar" style="width: {{progressPercent}}%;"></view>
