@@ -15,6 +15,8 @@ const PET_IMAGE_BY_KEY = {
   fox: "/images/pet/fox.jpg"
 };
 
+const MINI_CODE_IMAGE = "/images/qrcode/min-code.jpg";
+
 function resolvePetImageUrl(hit) {
   if (!hit || !hit.animalKey) return "";
   return PET_IMAGE_BY_KEY[hit.animalKey] || hit.imageUrl || "";
@@ -23,6 +25,9 @@ function resolvePetImageUrl(hit) {
 Page({
   data: {
     loading: true,
+    generatingPoster: false,
+    showPosterModal: false,
+    posterTempFilePath: "",
     result: {
       animalKey: "golden",
       title: "金毛系·阳光治愈犬",
@@ -73,15 +78,30 @@ Page({
   },
 
   onSavePoster() {
+    if (this.data.generatingPoster) return;
+    this.setData({ generatingPoster: true });
+
     const { result } = this.data;
     const imageSrc = result.imageUrl || "";
 
     const finish = (imagePath, imgW, imgH) => {
-      this.drawPosterToCanvas(result, imagePath, imgW, imgH);
+      this.drawPosterToCanvas(result, imagePath, imgW, imgH, MINI_CODE_IMAGE);
+    };
+
+    const timer = setTimeout(() => {
+      if (this.data.generatingPoster) {
+        this.setData({ generatingPoster: false });
+        wx.showToast({ title: "生成超时，请重试", icon: "none" });
+      }
+    }, 8000);
+
+    const safeFinish = (imagePath, imgW, imgH) => {
+      clearTimeout(timer);
+      finish(imagePath, imgW, imgH);
     };
 
     if (!imageSrc) {
-      finish("", 0, 0);
+      safeFinish("", 0, 0);
       return;
     }
 
@@ -91,20 +111,20 @@ Page({
         const tmpPath = `${wx.env.USER_DATA_PATH}/poster_pet.jpg`;
         try {
           wx.getFileSystemManager().copyFileSync(info.path, tmpPath);
-          finish(tmpPath, info.width, info.height);
+          safeFinish(tmpPath, info.width, info.height);
         } catch (e) {
           console.warn("poster copyFileSync fallback to package path", e);
-          finish(info.path, info.width, info.height);
+          safeFinish(info.path, info.width, info.height);
         }
       },
       fail: (err) => {
         console.warn("getImageInfo failed", err);
-        finish("", 0, 0);
+        safeFinish("", 0, 0);
       }
     });
   },
 
-  drawPosterToCanvas(result, imagePath, imgW, imgH) {
+  drawPosterToCanvas(result, imagePath, imgW, imgH, qrPath) {
     const ctx = wx.createCanvasContext("posterCanvas", this);
     const width = 600;
     const height = 900;
@@ -219,8 +239,8 @@ Page({
     const lineStep = 38;
 
     // 为底部文案预留空间，动态计算可展示行数，避免出现大面积空白
-    const footerY = height - 48;
-    const contentBottomSafe = footerY - 26;
+    const contentBottomY = height - 48;
+    const contentBottomSafe = contentBottomY - 26;
     const availableH = Math.max(0, contentBottomSafe - descTop);
     const maxDescLines = Math.max(2, Math.floor(availableH / lineStep));
 
@@ -228,10 +248,23 @@ Page({
       ctx.fillText(line, pad, descTop + idx * lineStep);
     });
 
-    // 底部提示
+    // 底部引导 + 小程序码占位区
+    const footerY = height - 56;
+    ctx.setFillStyle("#667085");
+    ctx.setFontSize(20);
+    ctx.fillText("来看看你属于哪种萌宠性格?", pad, footerY);
+
+    const qrSize = 84;
+    const qrX = width - pad - qrSize;
+    const qrY = height - 136;
+
+    if (qrPath) {
+      ctx.drawImage(qrPath, qrX, qrY, qrSize, qrSize);
+    }
+
     ctx.setFillStyle("#98a2b3");
-    ctx.setFontSize(18);
-    ctx.fillText("愿你像自己的专属小动物一样发光", pad, footerY);
+    ctx.setFontSize(14);
+    ctx.fillText("小程序码", qrX + 12, qrY + qrSize + 18);
 
     ctx.draw(false, () => {
       setTimeout(() => {
@@ -243,18 +276,15 @@ Page({
             destWidth: width,
             destHeight: height,
             success: (res) => {
-              wx.saveImageToPhotosAlbum({
-                filePath: res.tempFilePath,
-                success: () => {
-                  wx.showToast({ title: "海报已保存", icon: "success" });
-                },
-                fail: () => {
-                  wx.showToast({ title: "保存失败，请授权相册权限", icon: "none" });
-                }
-              }, this);
+              this.setData({
+                posterTempFilePath: res.tempFilePath,
+                showPosterModal: true,
+                generatingPoster: false
+              });
             },
             fail: (e) => {
               console.warn("canvasToTempFilePath failed", e);
+              this.setData({ generatingPoster: false });
               wx.showToast({ title: "海报生成失败", icon: "none" });
             }
           },
@@ -280,6 +310,32 @@ Page({
     }
     if (current) lines.push(current);
     return lines;
+  },
+
+  onClosePosterModal() {
+    this.setData({
+      showPosterModal: false,
+      posterTempFilePath: ""
+    });
+  },
+
+  onConfirmSavePoster() {
+    const filePath = this.data.posterTempFilePath;
+    if (!filePath) {
+      wx.showToast({ title: "海报未生成", icon: "none" });
+      return;
+    }
+
+    wx.saveImageToPhotosAlbum({
+      filePath,
+      success: () => {
+        wx.showToast({ title: "海报已保存", icon: "success" });
+        this.onClosePosterModal();
+      },
+      fail: () => {
+        wx.showToast({ title: "保存失败，请授权相册权限", icon: "none" });
+      }
+    }, this);
   },
 
   onRetest() {

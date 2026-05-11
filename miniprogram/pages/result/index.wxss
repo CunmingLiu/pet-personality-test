@@ -72,7 +72,7 @@ page {
   left: -120%;
   width: 120%;
   height: 100%;
-  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.55) 50%, rgba(255,255,255,0) 100%);
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.55) 50%, rgba(255, 255, 255, 0) 100%);
   animation: shimmer 1.3s infinite;
 }
 
@@ -115,7 +115,9 @@ page {
 }
 
 @keyframes shimmer {
-  100% { left: 120%; }
+  100% {
+    left: 120%;
+  }
 }
 
 .action-btn {
@@ -151,7 +153,79 @@ page {
   left: -9999rpx;
   top: -9999rpx;
   width: 600px;
-  height: 960px;
+  height: 900px;
+}
+
+.poster-modal-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 98;
+}
+
+.poster-modal {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  max-height: 88vh;
+  background: #fff;
+  border-radius: 28rpx 28rpx 0 0;
+  padding: 44rpx 28rpx 22rpx;
+  box-sizing: border-box;
+  z-index: 99;
+}
+
+.poster-modal-close {
+  position: absolute;
+  right: 16rpx;
+  top: 8rpx;
+  z-index: 3;
+  width: 72rpx;
+  height: 72rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 54rpx;
+  line-height: 1;
+  color: #98a2b3;
+}
+
+.poster-preview-wrap {
+  width: 74%;
+  height: 0;
+  padding-top: 111%;
+  margin: 0 auto;
+  position: relative;
+  border-radius: 20rpx;
+  background: #f8fafc;
+  overflow: hidden;
+}
+
+.poster-preview-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.poster-modal-tip {
+  margin-top: 20rpx;
+  text-align: center;
+  color: #667085;
+  font-size: 24rpx;
+}
+.btn-container{
+  display: flex;
+  justify-content: center;
+}
+.poster-save-btn {
+  width:225rpx !important;
+  margin: 12rpx auto 0;
+  height: 65rpx;
+  margin-top: 15rpx;
+  font-size: 35rpx;
 }
 
 .compliance-tip {

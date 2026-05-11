@@ -7,7 +7,6 @@
     </view>
     <view class="result-desc">{{result.desc}}</view>
   </view>
-
   <view class="result-card skeleton-card" wx:if="{{loading}}">
     <view class="skeleton-img"></view>
     <view class="skeleton-line w80"></view>
@@ -20,10 +19,20 @@
     <view class="skeleton-line"></view>
     <view class="skeleton-line w60"></view>
   </view>
-
-  <button class="action-btn" bindtap="onSavePoster" wx:if="{{!loading}}">保存海报</button>
+  <button class="action-btn" bindtap="onSavePoster" wx:if="{{!loading}}" loading="{{generatingPoster}}" disabled="{{generatingPoster}}">
+    生成海报
+  </button>
   <button class="action-btn share-btn" open-type="share">分享好友</button>
-  <button class="action-btn ghost-btn" bindtap="onRetest" wx:if="{{!loading}}">重新测试</button>
+  <!-- <button class="action-btn ghost-btn" bindtap="onRetest" wx:if="{{!loading}}">重新测试</button> -->
+  <view class="poster-modal-mask" wx:if="{{showPosterModal}}" catchtap="onClosePosterModal"></view>
+  <view class="poster-modal" wx:if="{{showPosterModal}}">
+    <view class="poster-modal-close" bindtap="onClosePosterModal">×</view>
+    <view class="poster-preview-wrap">
+      <image class="poster-preview-image" src="{{posterTempFilePath}}" mode="aspectFit"></image>
+    </view>
+    <view class="poster-modal-tip">保存后可在相册查看</view>
+    <button class="action-btn poster-save-btn" bindtap="onConfirmSavePoster">保存</button>
+  </view>
   <canvas canvas-id="posterCanvas" class="poster-canvas" width="600" height="900"></canvas>
   <!-- <view class="compliance-tip">本测试仅供娱乐，非专业心理测评</view> -->
   <view class="compliance-tip" wx:if="{{!loading}}">愿你像自己的专属小动物一样发光</view>
